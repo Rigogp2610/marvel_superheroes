@@ -2,7 +2,7 @@ package com.robgar.marvel.core.data.network.model
 
 import com.google.gson.annotations.SerializedName
 
-data class SuperheroApi (
+data class Superhero (
     @SerializedName("id") val id: Int,
     @SerializedName("name") val name: String,
     @SerializedName("description") val description: String,

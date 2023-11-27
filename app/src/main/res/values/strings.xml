@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Marvel</string>
+    <string name="error_internet">Internet no funciona bien. Vuelve a probar más tarde</string>
+    <string name="error_get_data">Ha habido un error al obtener los datos. Vuelva a intentarlo más tarde</string>
 </resources>
