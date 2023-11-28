@@ -22,7 +22,11 @@ class SuperheroesViewModel @Inject constructor(
     private val _superheroes = MutableLiveData<SuperheroesState>()
     val superheroes : LiveData<SuperheroesState> = _superheroes
 
-    fun getSuperheroes() {
+    init {
+        getSuperheroes()
+    }
+
+    private fun getSuperheroes() {
         if (hasInternetConnection(application.applicationContext)) {
             viewModelScope.launch(Dispatchers.IO) {
                 try {
@@ -45,6 +49,7 @@ class SuperheroesViewModel @Inject constructor(
                     _superheroes.postValue(SuperheroesState.Error(e.message ?: application.getString(R.string.error_get_data)))
                 }
             }
+        } else {
             _superheroes.postValue(SuperheroesState.Error(application.getString(R.string.error_internet)))
         }
     }

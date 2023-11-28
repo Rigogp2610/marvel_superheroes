@@ -7,6 +7,6 @@ import retrofit2.http.GET
 
 interface MarvelClient {
 
-    @GET("/v1/public/characters")
+    @GET("/v1/public/characters?limit=40")
     suspend fun getSuperheroes() : Response<PaginatedEnvelope<Superhero>>
 }
