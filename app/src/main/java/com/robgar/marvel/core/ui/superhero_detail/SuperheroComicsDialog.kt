@@ -22,9 +22,9 @@ import com.robgar.marvel.core.data.network.model.Superhero
 import com.robgar.marvel.ui.theme.BorderStrokeColor
 
 @Composable
-fun SuperheroComicsDialog(superhero: Superhero) {
+fun SuperheroComicsDialog(superhero: Superhero, onDismiss: () -> Unit) {
     Dialog(
-        onDismissRequest = {  }
+        onDismissRequest = { onDismiss() }
     ) {
         Column(
             Modifier

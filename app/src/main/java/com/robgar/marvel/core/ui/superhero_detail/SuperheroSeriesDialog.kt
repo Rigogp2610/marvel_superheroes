@@ -17,15 +17,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.robgar.marvel.core.data.network.model.ComicSummary
 import com.robgar.marvel.core.data.network.model.SeriesSummary
 import com.robgar.marvel.core.data.network.model.Superhero
 import com.robgar.marvel.ui.theme.BorderStrokeColor
 
 @Composable
-fun SuperheroSeriesDialog(superhero: Superhero) {
+fun SuperheroSeriesDialog(superhero: Superhero, onDismiss: () -> Unit) {
     Dialog(
-        onDismissRequest = {  }
+        onDismissRequest = { onDismiss() }
     ) {
         Column(
             Modifier

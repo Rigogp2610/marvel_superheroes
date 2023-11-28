@@ -7,6 +7,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -16,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.robgar.marvel.core.data.network.model.Superhero
@@ -96,7 +99,11 @@ fun SuperheroContent(superhero: Superhero, paddingValues: PaddingValues) {
 }
 
 @Composable
-fun BottomButtons(superhero: Superhero) {
+fun BottomButtons(superhero: Superhero, superheroViewModel: SuperheroViewModel = hiltViewModel()) {
+
+    val showComicDialog : Boolean by superheroViewModel.showComicDialog.observeAsState(initial = false)
+    val showSerieDialog : Boolean by superheroViewModel.showSerieDialog.observeAsState(initial = false)
+
     ConstraintLayout(
         Modifier
             .fillMaxSize()
@@ -115,7 +122,7 @@ fun BottomButtons(superhero: Superhero) {
                 },
             colors = ButtonDefaults.buttonColors(containerColor = AppColor),
             enabled = superhero.comics?.items != null && superhero.comics.items.isNotEmpty(),
-            onClick = {  }) {
+            onClick = { superheroViewModel.onShowComicDialogClick() }) {
             Text(
                 text = "Comics",
                 color = Color.White,
@@ -124,7 +131,7 @@ fun BottomButtons(superhero: Superhero) {
                 )
             )
         }
-        SuperheroComicsDialog(superhero = superhero)
+        if (showComicDialog) SuperheroComicsDialog(superhero = superhero) { superheroViewModel.onComicDialogClose() }
         Button(
             modifier = Modifier
                 .width(150.dp)
@@ -135,7 +142,7 @@ fun BottomButtons(superhero: Superhero) {
                 },
             colors = ButtonDefaults.buttonColors(containerColor = AppColor),
             enabled = superhero.series?.items != null && superhero.series.items.isNotEmpty(),
-            onClick = {}) {
+            onClick = { superheroViewModel.onShowSerieDialogClick() }) {
             Text(
                 text = "Series",
                 color = Color.White,
@@ -144,7 +151,7 @@ fun BottomButtons(superhero: Superhero) {
                 )
             )
         }
-        SuperheroSeriesDialog(superhero = superhero)
+        if (showSerieDialog) SuperheroSeriesDialog(superhero = superhero) { superheroViewModel.onSerieDialogClose() }
 
         createHorizontalChain(comics, series, chainStyle = ChainStyle.Spread)
     }
