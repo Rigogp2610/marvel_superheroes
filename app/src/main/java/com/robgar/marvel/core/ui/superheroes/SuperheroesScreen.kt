@@ -19,16 +19,17 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.robgar.marvel.core.data.network.model.Superhero
+import com.robgar.marvel.core.ui.Routes
+import com.robgar.marvel.core.ui.SUPERHEROE_DETAIL_ARGUMENT
 import com.robgar.marvel.ui.theme.AppColor
 import com.robgar.marvel.ui.theme.BorderStrokeColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SuperheroesScreen(viewModel: SuperheroesViewModel = hiltViewModel()) {
-    //viewModel.getSuperheroes()
-
+fun SuperheroesScreen(navController: NavHostController, viewModel: SuperheroesViewModel = hiltViewModel()) {
     val context = LocalContext.current
     val superheroesState : SuperheroesState by viewModel.superheroes.observeAsState(initial = SuperheroesState.Loading)
 
@@ -42,10 +43,28 @@ fun SuperheroesScreen(viewModel: SuperheroesViewModel = hiltViewModel()) {
                 .padding(it)
         ) {
             when (superheroesState) {
-                SuperheroesState.Loading -> { Box(modifier = Modifier.fillMaxSize()) { CircularProgressIndicator(modifier = Modifier.align(Alignment.Center)) } }
-                is SuperheroesState.Error -> { Toast.makeText(context, (superheroesState as SuperheroesState.Error).error, Toast.LENGTH_LONG).show() }
+                SuperheroesState.Loading -> {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(
+                                Alignment.Center
+                            )
+                        )
+                    }
+                }
+                is SuperheroesState.Error -> {
+                    Toast.makeText(
+                        context,
+                        (superheroesState as SuperheroesState.Error).error,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
                 is SuperheroesState.Success -> {
-                    SuperheroesList((superheroesState as SuperheroesState.Success).superheroes, viewModel)
+                    SuperheroesList(
+                        navController,
+                        (superheroesState as SuperheroesState.Success).superheroes,
+                        viewModel
+                    )
                 }
             }
         }
@@ -58,12 +77,19 @@ fun SuperheroesScreen(viewModel: SuperheroesViewModel = hiltViewModel()) {
 fun SuperheroesTopBar() {
     TopAppBar(
         title = { Text(text = "Superheroes") },
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = AppColor, titleContentColor = Color.White)
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = AppColor,
+            titleContentColor = Color.White
+        )
     )
 }
 
 @Composable
-fun SuperheroesList(superheroes: List<Superhero>, superheroesViewModel: SuperheroesViewModel) {
+fun SuperheroesList(
+    navController: NavHostController,
+    superheroes: List<Superhero>,
+    superheroesViewModel: SuperheroesViewModel
+) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -71,13 +97,13 @@ fun SuperheroesList(superheroes: List<Superhero>, superheroesViewModel: Superher
         modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp)
     ) {
         items(superheroes, key = { it.id }) { superhero ->
-            Superhero(superhero, superheroesViewModel)
+            Superhero(navController, superhero, superheroesViewModel)
         }
     }
 }
 
 @Composable
-fun Superhero(superhero: Superhero, superheroesViewModel: SuperheroesViewModel) {
+fun Superhero(navController: NavHostController, superhero: Superhero, superheroesViewModel: SuperheroesViewModel) {
     Card(
         border = BorderStroke(1.dp, BorderStrokeColor),
         colors = CardDefaults.cardColors(
@@ -85,7 +111,13 @@ fun Superhero(superhero: Superhero, superheroesViewModel: SuperheroesViewModel) 
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { }
+            .clickable {
+                navController.currentBackStackEntry?.savedStateHandle?.set (
+                    key = SUPERHEROE_DETAIL_ARGUMENT,
+                    value = superhero
+                )
+                navController.navigate(Routes.SuperheroeDetail.route)
+            }
     ) {
         Column {
             AsyncImage(
@@ -94,7 +126,9 @@ fun Superhero(superhero: Superhero, superheroesViewModel: SuperheroesViewModel) 
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.height(150.dp)
             )
-            Text(text = superhero.name, modifier = Modifier.align(Alignment.CenterHorizontally).padding(4.dp), color = Color.Black)
+            Text(text = superhero.name, modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(4.dp), color = Color.Black)
         }
     }
 }
