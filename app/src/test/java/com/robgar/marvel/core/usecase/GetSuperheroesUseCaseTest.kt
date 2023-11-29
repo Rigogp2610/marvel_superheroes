@@ -3,11 +3,11 @@ package com.robgar.marvel.core.usecase
 import com.robgar.marvel.core.data.MarvelRepository
 import com.robgar.marvel.core.data.network.model.Superhero
 import com.robgar.marvel.core.data.network.model.SuperheroImage
-import com.robgar.marvel.core.ui.superheroes.SuperheroesState
+import com.robgar.marvel.core.utils.flattenToList
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
-import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -38,13 +38,13 @@ class GetSuperheroesUseCaseTest {
     fun `get superheroes returns success`() = runBlocking {
         // Given
         val superheroesList = superheroes
-        coEvery { marvelRepository.getSuperheroes() } returns SuperheroesState.Success(superheroesList)
+        coEvery { marvelRepository.getSuperheroes() } returns flowOf(superheroesList)
 
         // When
         val response = getSuperheroesUseCase()
 
         // Then
-        assert(response is SuperheroesState.Success)
+        assert(response.flattenToList().size == 6)
     }
 
 }
